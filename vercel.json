@@ -1,0 +1,4 @@
+{
+    "buildCommand": "pnpm install --no-frozen-lockfile --prod=false && pnpm build",
+    "installCommand": "pnpm install --no-frozen-lockfile"
+}

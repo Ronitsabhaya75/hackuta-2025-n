@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.fancy-shadow {
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.info-shadow {
+  box-shadow: 0 0 30px rgba(60, 0, 78, 0.15)
+}
+
+.info-bg {
+  background: rgba(28, 0, 59, 0.1)
+}
+
+.building-glow-filter {
+  filter: drop-shadow(0 0 50px #ff3c00) drop-shadow(0 0 80px rgb(255, 0, 0));
+}
+
+.building-glow-mask {
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 20%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 20%);
+}
+
+.building-mask {
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 20%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 20%);
+}
+
+nav a {
+  font-size: 1.25rem; /* Equivalent to text-lg */
+  font-weight: bold;
+}
+
+
+@font-face {
+  font-family: 'Franklin Gothic Condensed';
+  src: url('/fonts/FranklinGothicCondensed.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Franklin Gothic';
+  src: url('/fonts/FranklinGothic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
