@@ -128,9 +128,9 @@ export default function Home() {
         </section>
         <section id="d-time-content" className="w-full flex justify-center">
           <p className="text-3xl mt-4 font-normal text-center max-w-[600px]">
-            Saturday March 29th, 2025 - 8:30 AM
+            October 4th - 5th 2025
             <br />
-            SIER Building, UTA Campus
+            SWSH/SEIR, UTA Campus
           </p>
         </section>
         <section
@@ -204,7 +204,7 @@ export default function Home() {
           </p>
         </section>
         <section id="schedule" className="scroll-mt-16 pt-10 mx-auto p-[50px]">
-          <h2 className="text-5xl font-bold">HackDay Schedule</h2>
+          <h2 className="text-5xl font-bold">HackUTA Schedule</h2>
           <div className="flex justify-center mt-4">
             <Schedule />
           </div>
