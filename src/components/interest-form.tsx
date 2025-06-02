@@ -44,11 +44,18 @@ import {
 
 import { iso31661 } from "iso-3166";
 
+import { createClient } from "@/lib/supabase/client";
+
 const FormSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
-  age: z.number().min(0).max(100),
-  phoneNumber: z.string().regex(/^\d{10}$/, "Phone number must be 10 digits"),
+  age: z
+    .string()
+    .min(1, "Age is required")
+    .max(3, "Age must be a valid number"),
+  phoneNumber: z
+    .string()
+    .regex(/^\d{11}$/, "Phone number must be 10 digits plus country code"),
   email: z.string().email("Invalid email address"),
   school: z.string({ required_error: "School is required" }),
   levelOfStudy: z.string({ required_error: "Level of study is required" }),
@@ -67,6 +74,8 @@ export default function InterestForm() {
     resolver: zodResolver(FormSchema),
   });
 
+  const supabase = createClient();
+
   // Remove duplicates from schools
   const uniqueSchools = removeDuplicates(schools);
 
@@ -80,6 +89,19 @@ export default function InterestForm() {
     });
 
     console.log("Form submitted with data:", data);
+
+    supabase
+      .from("interest-form")
+      .insert(data)
+      .then(({ error }) => {
+        if (error) {
+          console.error("Error inserting data:", error);
+          toast.error("Failed to submit form. Please try again.");
+        } else {
+          toast.success("Form submitted successfully!");
+          form.reset();
+        }
+      });
   }
   return (
     <Form {...form}>
@@ -129,6 +151,9 @@ export default function InterestForm() {
                   {...field}
                   className="input"
                   placeholder="Enter your age"
+                  type="number"
+                  min={0}
+                  max={100}
                 />
               </FormControl>
               <FormMessage />
@@ -187,7 +212,7 @@ export default function InterestForm() {
                       )}
                     >
                       {field.value
-                        ? uniqueSchools.find((school) => school === school)
+                        ? uniqueSchools.find((school) => school === field.value)
                         : "Select school"}
                       <ChevronsUpDown className="opacity-50" />
                     </Button>
@@ -235,7 +260,7 @@ export default function InterestForm() {
         />
         <FormField
           control={form.control}
-          name="email"
+          name="levelOfStudy"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Level of Study</FormLabel>
@@ -275,7 +300,8 @@ export default function InterestForm() {
                       )}
                     >
                       {field.value
-                        ? iso31661.find((iso) => iso.name === iso.name)?.name
+                        ? iso31661.find((iso) => iso.alpha3 === field.value)
+                            ?.name
                         : "Select country"}
                       <ChevronsUpDown className="opacity-50" />
                     </Button>
@@ -292,17 +318,17 @@ export default function InterestForm() {
                       <CommandGroup>
                         {iso31661.map((iso) => (
                           <CommandItem
-                            value={iso.alpha2}
-                            key={iso.alpha2}
+                            value={iso.alpha3}
+                            key={iso.alpha3}
                             onSelect={() => {
-                              form.setValue("countryOfResidence", iso.alpha2);
+                              form.setValue("countryOfResidence", iso.alpha3);
                             }}
                           >
                             {iso.name}
                             <Check
                               className={cn(
                                 "ml-auto",
-                                iso.alpha2 === field.value
+                                iso.alpha3 === field.value
                                   ? "opacity-100"
                                   : "opacity-0"
                               )}
