@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import Schedule from "@/components/schedule";
 import Faq from "@/components/faq";
+import InterestForm from "@/components/interest-form";
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
@@ -55,7 +56,9 @@ export default function Home() {
 
           <div
             className={`absolute top-full left-0 w-full bg-purple-950 bg-opacity-80 backdrop-blur-md flex flex-col items-center space-y-4 py-4 transition-all ${
-              isOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+              isOpen
+                ? "opacity-100 scale-100"
+                : "opacity-0 scale-95 pointer-events-none"
             }`}
           >
             {[
@@ -150,14 +153,16 @@ export default function Home() {
             SWSH/SEIR, UTA Campus
           </p>
         </section>
-        
+
         <div className="mt-16" />
 
         <section
           id="apply"
           className="scroll-mt-16 pt-10 mx-auto p-[40px] sm:p-[50px] flex flex-col items-center"
         >
-          <h2 className="text-3xl sm:text-5xl font-bold">ARE YOU READY TO GO BEYOND?</h2>
+          <h2 className="text-3xl sm:text-5xl font-bold">
+            ARE YOU READY TO GO BEYOND?
+          </h2>
         </section>
         <section id="apply" className="w-full flex justify-center">
           <a
@@ -201,8 +206,9 @@ export default function Home() {
             MOUSER ELECTRONICS
           </h2>
           <p className="text-lg sm:text-2xl mt-4 font-normal text-center max-w-[600px]">
-            Mouser Electronics is a worldwide leading authorized distributor of semiconductors 
-            and electronic components for over 700 industry leading manufacturers.
+            Mouser Electronics is a worldwide leading authorized distributor of
+            semiconductors and electronic components for over 700 industry
+            leading manufacturers.
           </p>
 
           <div className="mt-16" />
@@ -257,8 +263,30 @@ export default function Home() {
             <div className="flex flex-col justify-center items-center gap-x-16 gap-y-5 xl:gap-28 lg:flex-row lg:justify-between max-lg:max-w-2xl mx-auto max-w-full w-[70%]">
               <div className="w-full">
                 <h2 className="text-3xl sm:text-5xl font-bold mb-2">FAQ</h2>
-                <div className="accordion-group" data-accordion="default-accordion">
+                <div
+                  className="accordion-group"
+                  data-accordion="default-accordion"
+                >
                   <Faq />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Interest Form */}
+        <section id="interest-form" className="py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col justify-center items-center gap-x-16 gap-y-5 xl:gap-28 lg:flex-row lg:justify-between max-lg:max-w-2xl mx-auto max-w-full w-[70%]">
+              <div className="w-full">
+                <h2 className="text-3xl sm:text-5xl font-bold mb-2">
+                  Interest Form
+                </h2>
+                <div
+                  className="accordion-group"
+                  data-accordion="default-accordion"
+                >
+                  <InterestForm />
                 </div>
               </div>
             </div>
