@@ -84,18 +84,12 @@ export default function Home() {
           href="https://mlh.io/na?utm_source=na-hackathon&utm_medium=TrustBadge&utm_campaign=2026-season&utm_content=black"
           target="_blank"
           rel="noopener noreferrer"
-          style={{
-            position: "absolute",
-            right: "10px",
-            top: "0px",
-            width: "90px",
-            zIndex: 10000,
-          }}
+          className="fixed z-[10000] right-2 top-[0px] w-[60px] sm:w-[80px] md:w-[90px]"
         >
           <img
             src="https://s3.amazonaws.com/logged-assets/trust-badge/2026/mlh-trust-badge-2026-black.svg"
             alt="Major League Hacking 2026 Hackathon Season"
-            style={{ width: "100%" }}
+            className="w-full h-auto"
           />
         </a>
       </nav>
