@@ -1,75 +1,9 @@
 [
     {
         "id": 1,
-        "label": "Check In",
-        "time-start": "8:30 AM",
-        "time-end": "10:00 AM",
-        "inline": false
-    },
-    {
-        "id": 2,
-        "label": "Opening Ceremony",
-        "time-start": "10:00 AM",
-        "time-end": "11:00 AM",
-        "parent": -1,
-        "inline": false
-    },
-    {
-        "id": 3,
         "label": "Hacking Begins",
-        "time-start": "11:00 AM",
-        "time-end": "",
-        "indent": true,
-        "children": [
-            {
-                "id": 4,
-                "label": "Lunch",
-                "time-start": "12:00 PM",
-                "time-end": "",
-                "inline": false
-            },
-            {
-                "id": 5,
-                "label": "Mini-Event",
-                "time-start": "1:30 PM",
-                "time-end": "",
-                "inline": false
-            },
-            {
-                "id": 6,
-                "label": "ACM Research Workshop",
-                "time-start": "3:30 PM",
-                "time-end": "4:30 PM",
-                "inline": false
-            }
-        ]
-    },
-    {
-        "id": 7,
-        "label": "Dinner",
-        "time-start": "5:00 PM",
-        "time-end": "",
-        "inline": true
-    },
-    {
-        "id": 8,
-        "label": "Hacking Ends",
-        "time-start": "",
-        "time-end": "6:00 PM",
-        "inline": true
-    },
-    {
-        "id": 9,
-        "label": "Judging",
-        "time-start": "6:00 PM",
-        "time-end": "",
-        "inline": true
-    },
-    {
-        "id": 10,
-        "label": "Closing Ceremony",
-        "time-start": "8:15 PM",
-        "time-end": "",
-        "inline": false
+        "time-start": "October 4th 12:00 PM",
+        "time-end": "October 5th 12:00 PM",
+        "indent": true
     }
 ]

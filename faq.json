@@ -7,21 +7,21 @@
     {
         "id": 2,
         "label": "How many people can be on a team?",
-        "content": "HackDay Teams consist of three members per team. You can either apply with a team, or apply without a team and get matched with one for the event."
+        "content": "HackUTA Teams consist of four members per team. You can either apply with a team, or apply without a team and get matched with one for the event."
     },
     {
         "id": 3,
         "label": "How long do we have to work on our projects?",
-        "content": "Hacking begins at 11:00 AM and ends at 6:00 PM. You will have 7 hours to work on your project."
+        "content": "Hacking begins October 4th at 12:00 PM and ends October 5th at 12:00 PM. You will have 24 hours to work on your project."
     },
     {
         "id": 4,
         "label": "Will there be food?",
-        "content": "We will provide lunch and dinner (New York Eats and Chipotle!), times are available on the schedule above."
+        "content": "We will provide lunch, dinner, breakfast, and a final lunch, times will be available on the schedule above."
     },
     {
         "id": 5,
         "label": "Where is the event?",
-        "content": "The event is being held at the SEIR in rooms 194, 198, 294, and 298!"
+        "content": "The event is being held at the SWSH and SEIR at UTA!"
     }
 ]

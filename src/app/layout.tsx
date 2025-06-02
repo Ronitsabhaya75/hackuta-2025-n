@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HackDay 2025",
-  description: "March 29th, 2025 - 8:30AM\nDeveloped by HackUTA",
+  title: "HackUTA 2025",
+  description: "October 4th - 5th, 2025 - 8:00AM\nDeveloped by HackUTA",
 };
 
 export default function RootLayout({
