@@ -8,6 +8,9 @@ import { z } from "zod";
 
 import schools from "@/data/schools.json";
 import levelsOfStudy from "@/data/levels-of-study.json";
+import dietaryRestrictions from "@/data/dietary-restrictions.json";
+import pronouns from "@/data/pronouns.json";
+import raceEthnicity from "@/data/race-ethnicity.json";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -41,12 +44,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 
 import { iso31661 } from "iso-3166";
 
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
+import { useState } from "react";
 
 const FormSchema = z.object({
+  // General Information
   firstName: z.string().min(1),
   lastName: z.string().min(1),
   age: z
@@ -63,6 +79,21 @@ const FormSchema = z.object({
     required_error: "Country of residence is required",
   }),
   linkedInUrl: z.string().url("Invalid LinkedIn URL").optional(),
+  // Optional Demographic Information
+  dietaryRestrictions: z.string().optional(),
+  underRepresentedGroup: z.string().optional(),
+  genderIdentity: z.string().optional(),
+  pronouns: z.string().optional(),
+  raceOrEthnicity: z.string().optional(),
+  lgbtqiaPlus: z.boolean().optional(),
+  completedEducation: z.string().optional(),
+  tShirtSize: z.string().optional(),
+  shippingAddress: z.string().optional(),
+  majorFieldOfStudy: z.string().optional(),
+  // MLH Required Fields
+  codeOfConduct: z.boolean(),
+  mlhDataHandling: z.boolean(),
+  mlhPromotionalEmails: z.boolean().optional(),
 });
 
 function removeDuplicates<T>(arr: T[]): T[] {
@@ -80,6 +111,7 @@ export default function InterestForm() {
   const uniqueSchools = removeDuplicates(schools);
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
+    console.log("Hello!");
     toast("You submitted the following values", {
       description: (
         <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
@@ -105,266 +137,697 @@ export default function InterestForm() {
   }
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="firstName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>First Name</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  className="input"
-                  placeholder="Enter your first name"
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        onError={() => console.log("Error has been Captured.")}
+        className="space-y-6 z-0"
+      >
+        <Dialog>
+          <DialogTrigger className="border rounded-lg py-1 px-2 text-center bg-blue-500 text-white hover:bg-blue-600 transition-colors">
+            Fill out our Interest Form!
+          </DialogTrigger>
+          <DialogContent className="flex max-h-[75%] overflow-y-scroll max-w-[65%] scrollbar-hide justify-center">
+            <Tabs
+              defaultValue="general"
+              className="w-[90%]"
+              orientation="vertical"
+            >
+              <TabsList className="flex items-center justify-center">
+                <TabsTrigger value="general">General Information</TabsTrigger>
+                <TabsTrigger value="optional">
+                  Optional Demographic Information
+                </TabsTrigger>
+                <TabsTrigger value="mlh">Submit Here</TabsTrigger>
+              </TabsList>
+              <TabsContent value="general">
+                <DialogHeader>
+                  <DialogTitle>HackUTA Interest Form</DialogTitle>
+                  <DialogDescription>
+                    Please fill out the form below to express your interest in
+                    participating in HackUTA. Your information will help us keep
+                    you updated about the event and its details.
+                  </DialogDescription>
+                </DialogHeader>
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          className="input"
+                          placeholder="Enter your first name"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="lastName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Last Name</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  className="input"
-                  placeholder="Enter your last name"
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          className="input"
+                          placeholder="Enter your last name"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="age"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Age</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  className="input"
-                  placeholder="Enter your age"
-                  type="number"
-                  min={0}
-                  max={100}
+                <FormField
+                  control={form.control}
+                  name="age"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Age</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          className="input"
+                          placeholder="Enter your age"
+                          type="number"
+                          min={0}
+                          max={100}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="phoneNumber"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Phone Number</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  className="input"
-                  placeholder="Enter your phone number (10 digits + Country Code)"
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          className="input"
+                          placeholder="Enter your phone number (10 digits + Country Code)"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  className="input"
-                  placeholder="Enter your email address"
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          className="input"
+                          placeholder="Enter your email address"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="school"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>School</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "w-[200px] justify-between",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value
-                        ? uniqueSchools.find((school) => school === field.value)
-                        : "Select school"}
-                      <ChevronsUpDown className="opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
-                  <Command>
-                    <CommandInput
-                      placeholder="Search schools..."
-                      className="h-9"
-                    />
-                    <CommandList>
-                      <CommandEmpty>No school found.</CommandEmpty>
-                      <CommandGroup>
-                        {uniqueSchools.map((school) => (
-                          <CommandItem
-                            value={school}
-                            key={school}
-                            onSelect={() => {
-                              form.setValue("school", school);
-                            }}
-                          >
-                            {school}
-                            <Check
+                <FormField
+                  control={form.control}
+                  name="school"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>School</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
                               className={cn(
-                                "ml-auto",
-                                school === field.value
-                                  ? "opacity-100"
-                                  : "opacity-0"
+                                "w-[200px] justify-between",
+                                !field.value && "text-muted-foreground"
                               )}
+                            >
+                              {field.value
+                                ? uniqueSchools.find(
+                                    (school) => school === field.value
+                                  )
+                                : "Select school"}
+                              <ChevronsUpDown className="opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[200px] p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search schools..."
+                              className="h-9"
                             />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              {/* <FormDescription>
+                            <CommandList>
+                              <CommandEmpty>No school found.</CommandEmpty>
+                              <CommandGroup>
+                                {uniqueSchools.map((school) => (
+                                  <CommandItem
+                                    value={school}
+                                    key={school}
+                                    onSelect={() => {
+                                      form.setValue("school", school);
+                                    }}
+                                  >
+                                    {school}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto",
+                                        school === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      {/* <FormDescription>
                 This is the language that will be used in the dashboard.
               </FormDescription> */}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="levelOfStudy"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Level of Study</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your level of study." />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {levelsOfStudy.map((level) => (
-                    <SelectItem key={level} value={level}>
-                      {level}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="countryOfResidence"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Country of Residence</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "w-[200px] justify-between",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value
-                        ? iso31661.find((iso) => iso.alpha3 === field.value)
-                            ?.name
-                        : "Select country"}
-                      <ChevronsUpDown className="opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
-                  <Command>
-                    <CommandInput
-                      placeholder="Search schools..."
-                      className="h-9"
-                    />
-                    <CommandList>
-                      <CommandEmpty>No country found.</CommandEmpty>
-                      <CommandGroup>
-                        {iso31661.map((iso) => (
-                          <CommandItem
-                            value={iso.alpha3}
-                            key={iso.alpha3}
-                            onSelect={() => {
-                              form.setValue("countryOfResidence", iso.alpha3);
-                            }}
-                          >
-                            {iso.name}
-                            <Check
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="levelOfStudy"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Level of Study</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your level of study." />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {levelsOfStudy.map((level) => (
+                            <SelectItem key={level} value={level}>
+                              {level}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="countryOfResidence"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Country of Residence</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
                               className={cn(
-                                "ml-auto",
-                                iso.alpha3 === field.value
-                                  ? "opacity-100"
-                                  : "opacity-0"
+                                "w-[200px] justify-between",
+                                !field.value && "text-muted-foreground"
                               )}
+                            >
+                              {field.value
+                                ? iso31661.find(
+                                    (iso) => iso.alpha3 === field.value
+                                  )?.name
+                                : "Select country"}
+                              <ChevronsUpDown className="opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[200px] p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search schools..."
+                              className="h-9"
                             />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              {/* <FormDescription>
+                            <CommandList>
+                              <CommandEmpty>No country found.</CommandEmpty>
+                              <CommandGroup>
+                                {iso31661.map((iso) => (
+                                  <CommandItem
+                                    value={iso.alpha3}
+                                    key={iso.alpha3}
+                                    onSelect={() => {
+                                      form.setValue(
+                                        "countryOfResidence",
+                                        iso.alpha3
+                                      );
+                                    }}
+                                  >
+                                    {iso.name}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto",
+                                        iso.alpha3 === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      {/* <FormDescription>
                 This is the language that will be used in the dashboard.
               </FormDescription> */}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="linkedInUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>LinkedIn URL</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  className="input"
-                  placeholder="Enter your LinkedIn profile URL (optional)"
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Submit</Button>
+                <FormField
+                  control={form.control}
+                  name="linkedInUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>LinkedIn URL</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          className="input"
+                          placeholder="Enter your linkedin URL"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <br />
+              </TabsContent>
+              <TabsContent value="optional">
+                <DialogHeader>
+                  <DialogTitle>Optional Demographic Information</DialogTitle>
+                  <DialogDescription>
+                    HackUTA Strives to create an inclusive and diverse
+                    environment. Providing this information is optional and will
+                    help us understand the demographics of our participants. All
+                    information will be kept confidential and used only for
+                    statistical purposes.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <FormField
+                  control={form.control}
+                  name="dietaryRestrictions"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Dietary Restrictions</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={"None"}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your dietary restriction." />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {dietaryRestrictions.map((rest) => (
+                            <SelectItem key={rest} value={rest}>
+                              {rest}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="underRepresentedGroup"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Under Representation</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Y/N/U" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem key={"yes"} value={"Yes"}>
+                            Yes
+                          </SelectItem>
+                          <SelectItem key={"no"} value={"No"}>
+                            No
+                          </SelectItem>
+                          <SelectItem key={"unsure"} value={"Unsure"}>
+                            Unsure
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="genderIdentity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gender Identity</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="M/F/NB/O" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem key={"man"} value={"Man"}>
+                            Man
+                          </SelectItem>
+                          <SelectItem key={"woman"} value={"Woman"}>
+                            Woman
+                          </SelectItem>
+                          <SelectItem key={"nonbinary"} value={"Non-Binary"}>
+                            Non-Binary
+                          </SelectItem>
+                          <SelectItem
+                            key={"pretsd"}
+                            value={"Prefer to self-describe"}
+                          >
+                            Prefer to self-describe
+                          </SelectItem>
+                          <SelectItem
+                            key={"pnta"}
+                            value={"Prefer Not to Answer"}
+                          >
+                            Prefer Not to Answer
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="pronouns"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pronouns</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Please Select your Pronouns" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {pronouns.map((pronoun) => (
+                            <SelectItem key={pronoun} value={pronoun}>
+                              {pronoun}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="raceOrEthnicity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Race or Ethnicity</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Please Select your Race or Ethnicity" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {raceEthnicity.map((re) => (
+                            <SelectItem key={re} value={re}>
+                              {re}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="lgbtqiaPlus"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <FormLabel>LGBTQIA+ Identification</FormLabel>
+                        <FormDescription>
+                          Do you identify as a member of the LGBTQIA+ community?
+                        </FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          defaultChecked={false}
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="completedEducation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Highest Completed Education</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Please Select your Education" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {levelsOfStudy.map((re) => (
+                            <SelectItem key={re} value={re}>
+                              {re}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="tShirtSize"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>T-Shirt Size</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Please Select your T-Shirt Size" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {["XS", "S", "M", "L", "XL", "XXL"].map((size) => (
+                            <SelectItem key={size} value={size}>
+                              {size}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="shippingAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Shipping Address</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          className="input"
+                          placeholder="Enter your shipping address"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="majorFieldOfStudy"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Major Field of Study</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          className="input"
+                          placeholder="Enter your major field of study"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <br />
+              </TabsContent>
+              <TabsContent value="mlh">
+                <DialogHeader>
+                  <DialogTitle>Disclaimers</DialogTitle>
+                  <DialogDescription>
+                    HackUTA is partnered with Major League Hacking (MLH) and
+                    adheres to their Code of Conduct. Please review the
+                    information below before submitting your interest form.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="codeOfConduct"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                        <div className="space-y-0.5">
+                          <FormLabel>Code of Conduct</FormLabel>
+                          <FormDescription>
+                            I have read and agree to the{" "}
+                            <Link
+                              className="text-blue-500 hover:underline"
+                              href="https://github.com/MLH/mlh-policies/blob/main/code-of-conduct.md"
+                              target="_blank"
+                            >
+                              MLH Code of Conduct
+                            </Link>
+                            .
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="mlhDataHandling"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                        <div className="space-y-0.5">
+                          <FormLabel>MLH Data Handling</FormLabel>
+                          <FormDescription>
+                            I authorize you to share my application/registration
+                            information with Major League Hacking for event
+                            administration, ranking, and MLH administration
+                            in-line with the{" "}
+                            <Link
+                              className="text-blue-500 hover:underline"
+                              href="https://github.com/MLH/mlh-policies/blob/main/privacy-policy.md"
+                              target="_blank"
+                            >
+                              MLH Privacy Policy
+                            </Link>
+                            . I further agree to the terms of both the{" "}
+                            <Link
+                              className="text-blue-500 hover:underline"
+                              href="https://github.com/MLH/mlh-policies/blob/main/contest-terms.md"
+                              target="_blank"
+                            >
+                              MLH Contest Terms and Conditions
+                            </Link>{" "}
+                            and the{" "}
+                            <Link
+                              className="text-blue-500 hover:underline"
+                              href="https://github.com/MLH/mlh-policies/blob/main/privacy-policy.md"
+                              target="_blank"
+                            >
+                              MLH Privacy Policy
+                            </Link>
+                            .
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="mlhPromotionalEmails"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                        <div className="space-y-0.5">
+                          <FormLabel>MLH Promotional Emails</FormLabel>
+                          <FormDescription>
+                            I authorize MLH to send me occasional emails about
+                            relevant events, career opportunities, and community
+                            announcements.
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit">Submit</Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </DialogContent>
+        </Dialog>
       </form>
     </Form>
   );

@@ -282,10 +282,7 @@ export default function Home() {
                 <h2 className="text-3xl sm:text-5xl font-bold mb-2">
                   Interest Form
                 </h2>
-                <div
-                  className="accordion-group"
-                  data-accordion="default-accordion"
-                >
+                <div className="text-lg sm:text-2xl font-normal mb-4">
                   <InterestForm />
                 </div>
               </div>
