@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+// THIS FUNCTION SHOULD ONLY BE USED IN SERVER SIDE COMPONENTS. ANY AND ALL CLIENT SIDE COMPONENTS SHOULD USE `createClient` FROM `src/lib/supabase/client.ts` INSTEAD.
+
 export async function createClient() {
     const cookieStore = await cookies();
 
