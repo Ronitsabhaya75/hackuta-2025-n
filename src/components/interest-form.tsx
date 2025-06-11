@@ -57,7 +57,6 @@ import {
   DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -68,7 +67,7 @@ import { iso31661 } from "iso-3166";
 
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 const FormSchema = z.object({
   // General Information
