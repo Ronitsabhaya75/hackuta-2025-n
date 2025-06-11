@@ -3,6 +3,22 @@
 import scheduleData from "../../schedule.json";
 import useWindowSize from "@/hooks/useWindowSize";
 
+type ScheduleEvent = {
+  id: number;
+  label: string;
+  "time-start": string;
+};
+
+type ScheduleDay = {
+  id: number;
+  label: string;
+  "time-start": string;
+  "time-end": string;
+  indent: boolean;
+  inline?: boolean;
+  children?: ScheduleEvent[];
+};
+
 export default function Schedule() {
   const size = useWindowSize();
 
@@ -26,10 +42,10 @@ export default function Schedule() {
             </h2>
             {day["time-end"] != "" ? <p>Ends At: {day["time-end"]}</p> : <></>}
 
-            {day["children"] != undefined ? (
+            {(day as ScheduleDay)["children"] != undefined ? (
               <div className="flex justify-center mt-4 md:pb-4 sm:pb-2">
                 <div className="grid grid-cols-1 gap-4 w-[70%]">
-                  {day["children"].map((event) => (
+                  {(day as ScheduleDay)["children"]!.map((event) => (
                     <div
                       className="text-white xl:text-2xl lg:text-xl border rounded-lg p-2"
                       key={event.id}
@@ -47,7 +63,11 @@ export default function Schedule() {
           </div>
         );
 
-        if (day.inline != null && day.inline && size.width >= 968) {
+        if (
+          (day as ScheduleDay).inline != null &&
+          (day as ScheduleDay).inline &&
+          size.width >= 968
+        ) {
           reval = (
             <div
               className="text-white lg:text-2xl md:text-xl border rounded-lg p-2"

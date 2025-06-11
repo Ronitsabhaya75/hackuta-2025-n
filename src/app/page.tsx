@@ -89,7 +89,9 @@ export default function Home() {
           rel="noopener noreferrer"
           className="fixed z-[10000] right-2 top-[0px] w-[60px] sm:w-[80px] md:w-[90px]"
         >
-          <img
+          <Image
+            width={90}
+            height={157}
             src="https://s3.amazonaws.com/logged-assets/trust-badge/2026/mlh-trust-badge-2026-black.svg"
             alt="Major League Hacking 2026 Hackathon Season"
             className="w-full h-auto"
