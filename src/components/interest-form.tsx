@@ -136,8 +136,9 @@ export default function InterestForm() {
   }
   return (
     <Dialog>
-      <DialogTrigger className="border rounded-lg py-1 px-2 text-center bg-blue-500 text-white hover:bg-blue-600 transition-colors">
-        Fill out our Interest Form!
+      <DialogTrigger className="font-franklinGothic relative px-8 py-3 text-lg sm:text-2xl font-semibold text-white rounded-full transition duration-300
+              bg-gradient-to-r from-purple-600 to-red-500 hover:from-purple-600 hover:to-blue-600 shadow-lg hover:shadow-xl w-[90%] max-w-[300px] text-center">
+        REGISTER NOW
       </DialogTrigger>
       <DialogContent className="max-h-[75%] overflow-y-scroll">
         <Form {...form}>

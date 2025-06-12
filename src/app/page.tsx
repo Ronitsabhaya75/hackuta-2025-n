@@ -166,24 +166,24 @@ export default function Home() {
             ARE YOU READY TO GO BEYOND?
           </h2>
         </section>
-        <section id="apply" className="w-full flex justify-center">
-          <a
-            href="https://docs.google.com/forms/d/e/1FAIpQLScBIrfcTsXM32cx4RX1HQItdzIkzVIVj57EL1k5caWSw_btdA/viewform?usp=sharing"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-franklinGothic relative px-8 py-3 text-lg sm:text-2xl font-semibold text-white rounded-full transition duration-300
-              bg-gradient-to-r from-purple-600 to-red-500 hover:from-purple-600 hover:to-blue-600 shadow-lg hover:shadow-xl w-[90%] max-w-[300px] text-center"
-          >
-            APPLY NOW
-          </a>
+        {/* Interest Form */}
+        <section id="interest-form" className="py-4">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col justify-center items-center gap-x-16 gap-y-5 xl:gap-28 lg:flex-row lg:justify-between max-lg:max-w-2xl mx-auto max-w-full w-[70%]">
+              <div className="w-full">
+                <div className="text-lg sm:text-2xl font-normal mb-4">
+                  <InterestForm />
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
-
         <section id="discord" className="w-full flex justify-center">
           <a
             href="https://discord.gg/2bVsYS3SgS"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-franklinGothic relative mt-[20px] px-8 py-3 text-lg sm:text-2xl font-semibold text-white rounded-full transition duration-300
+            className="font-franklinGothic relative px-8 py-3 text-lg sm:text-2xl font-semibold text-white rounded-full transition duration-300
               bg-gradient-to-r from-purple-600 to-red-500 hover:from-purple-600 hover:to-blue-600 shadow-lg hover:shadow-xl w-[90%] max-w-[300px] text-center"
           >
             JOIN OUR DISCORD
@@ -270,22 +270,6 @@ export default function Home() {
                   data-accordion="default-accordion"
                 >
                   <Faq />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Interest Form */}
-        <section id="interest-form" className="py-24">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col justify-center items-center gap-x-16 gap-y-5 xl:gap-28 lg:flex-row lg:justify-between max-lg:max-w-2xl mx-auto max-w-full w-[70%]">
-              <div className="w-full">
-                <h2 className="text-3xl sm:text-5xl font-bold mb-2">
-                  Interest Form
-                </h2>
-                <div className="text-lg sm:text-2xl font-normal mb-4">
-                  <InterestForm />
                 </div>
               </div>
             </div>
