@@ -38,7 +38,7 @@ export default function Home() {
               <a
                 key={item.name}
                 href={item.href}
-                className="font-franklinGothic lg:text-2xl md:text-lg font-normal hover:text-purple-300 transition shrink"
+                className="text-white font-franklinGothic lg:text-2xl md:text-lg font-normal hover:text-purple-300 transition shrink"
               >
                 {item.name}
               </a>
