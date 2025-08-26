@@ -81,7 +81,7 @@ const FormSchema = z.object({
     .string()
     .regex(/^\d{11}$/, "Phone number must be 10 digits plus country code"),
   email: z.string().email("Invalid email address"),
-  school: z.string({ required_error: "School is required" }),
+  school: z.string().optional(),
   levelOfStudy: z.string({ required_error: "Level of study is required" }),
   countryOfResidence: z.string({
     required_error: "Country of residence is required",
@@ -121,6 +121,10 @@ export default function InterestForm() {
   const uniqueSchools = removeDuplicates(schools);
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
+    if (data.school === undefined) {
+      data.school = "Other";
+    }
+
     supabase
       .from("interest-form")
       .insert(data)
@@ -136,8 +140,10 @@ export default function InterestForm() {
   }
   return (
     <Dialog>
-      <DialogTrigger className="font-franklinGothic relative px-8 py-3 text-lg sm:text-2xl font-semibold text-white rounded-full transition duration-300
-              bg-gradient-to-r from-purple-600 to-red-500 hover:from-purple-600 hover:to-blue-600 shadow-lg hover:shadow-xl w-[90%] max-w-[300px] text-center">
+      <DialogTrigger
+        className="font-franklinGothic relative px-8 py-3 text-lg sm:text-2xl font-semibold text-white rounded-full transition duration-300
+              bg-gradient-to-r from-purple-600 to-red-500 hover:from-purple-600 hover:to-blue-600 shadow-lg hover:shadow-xl w-[90%] max-w-[300px] text-center"
+      >
         REGISTER NOW
       </DialogTrigger>
       <DialogContent className="max-h-[75%] overflow-y-scroll">
