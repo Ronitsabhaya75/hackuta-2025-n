@@ -137,7 +137,7 @@ export default function Home() {
           </h2>
           <p className="text-lg sm:text-2xl mt-4 font-normal text-center max-w-[600px]">
             Mouser Electronics is a worldwide leading authorized distributor of
-            semiconductors and electronic components for over 700 industry
+            semiconductors and electronic components for over 1,200 industry
             leading manufacturers.
           </p>
 
