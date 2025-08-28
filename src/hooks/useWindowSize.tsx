@@ -17,6 +17,8 @@ function useWindowSize() {
       });
     }
 
+
+    
     window.addEventListener("resize", handleResize);
     handleResize();
 
