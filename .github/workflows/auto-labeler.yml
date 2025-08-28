@@ -37,16 +37,16 @@ jobs:
               - 'tailwind.config.*'
               - 'tsconfig.json'
               - 'postcss.config.*'
-              - 'components.json'
               - 'vercel.json'
             javascript:
               - 'src/**/*.js'
               - 'src/**/*.jsx'
               - 'src/**/*.ts'
               - 'src/**/*.tsx'
+            config:
+              - 'components.json'
             json:
               - 'src/data/**/*.json'
-              - '**/*.json'
             assets:
               - 'public/**'
             documentation:
@@ -88,18 +88,41 @@ jobs:
               labels: ['javascript']
             })
 
+      - name: Add Config label
+        if: steps.changed-files.outputs.config_any_changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            try {
+              await github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: ['config']
+              });
+              console.log('Added Config label successfully');
+            } catch (error) {
+              console.log('Error adding Config label:', error.message);
+            }
+
       - name: Add JSON label
         if: steps.changed-files.outputs.json_any_changed == 'true'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ['json']
-            })
+            try {
+              await github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: ['json']
+              });
+              console.log('Added JSON label successfully');
+            } catch (error) {
+              console.log('Error adding JSON label:', error.message);
+            }
 
       - name: Add Styles label
         if: steps.changed-files.outputs.styles_any_changed == 'true'
