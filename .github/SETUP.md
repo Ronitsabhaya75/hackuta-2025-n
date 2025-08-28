@@ -1,6 +1,6 @@
 # GitHub Actions Setup
 
-This repository includes 4 separate GitHub Actions workflows that run independently:
+This repository includes 6 separate GitHub Actions workflows that run independently:
 
 ## Workflows Created
 
@@ -40,6 +40,23 @@ This repository includes 4 separate GitHub Actions workflows that run independen
   - Comments on PR with results
   - Includes placeholder Supabase env vars for build process
   - Runs automatically without approval
+
+### 5. Security Check (`security-check.yml`)
+- **Trigger**: PR to main, push to main, weekly schedule
+- **Purpose**: Scans for security vulnerabilities and performs code analysis
+- **Features**:
+  - npm audit for dependency vulnerabilities
+  - CodeQL analysis for code security issues
+  - Comments on PR with security findings
+  - Weekly scheduled scans
+
+### 6. Workflow Reporter (`workflow-reporter.yml`)
+- **Trigger**: When other workflows complete
+- **Purpose**: Provides consolidated reporting of all workflow results
+- **Features**:
+  - Creates/updates a status table in PR comments
+  - Shows status, duration, and links for each workflow
+  - Real-time updates as workflows complete
 
 ## Labels to Create
 
