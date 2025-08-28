@@ -1,79 +1,54 @@
 # GitHub Actions Setup
 
-This repository includes 8 separate GitHub Actions workflows that run independently:
+This repository includes 7 GitHub Actions workflows that run **sequentially** in the following order:
 
 ## Workflows Created
 
-### 1. Gatekeeper (`gatekeeper.yml`)
-- **Trigger**: On PR open, sync, or reopen  
+## Sequential Workflow Order:
+
+### 1. 🔓 Gatekeeper (`gatekeeper.yml`)
+- **Trigger**: On PR open, sync, or reopen (pull_request_target)
 - **Purpose**: Auto-approves workflow runs to bypass manual approval requirement
-- **Features**:
-  - Automatically approves all workflows for PRs
-  - Enables workflows to run without maintainer approval
+- **Runs**: First - enables all other workflows to run
 
-### 2. Label PRs (`auto-labeler.yml`)
-- **Trigger**: On PR open (using pull_request_target)
-- **Purpose**: Automatically labels PRs based on changed files using Node.js style config
+### 2. 🏷️ Label PRs (`auto-labeler.yml`)  
+- **Trigger**: After Gatekeeper completes successfully
+- **Purpose**: Automatically labels PRs based on changed files
 - **Labels Applied**:
-  - `CI Changes` - Config files, package.json, workflows, etc.
-  - `JavaScript Changes` - .js, .jsx, .ts, .tsx files
-  - `JSON Changes` - .json files
-  - `Styles Changes` - CSS/SCSS files
-  - `Assets Changes` - Images, fonts, public files
-  - `Documentation Changes` - Markdown files
+  - `ci` - Config files, workflows, package.json
+  - `javascript` - .js, .jsx files
+  - `typescript` - .ts, .tsx files  
+  - `json` - JSON data files
+  - `css` - Styles and CSS files
+  - `assets` - Images, fonts, public files
+  - `doc` - Markdown documentation
 
-### 3. Lint Check (`lint.yml`)
-- **Trigger**: PR to main (using pull_request_target), push to main
-- **Purpose**: Runs ESLint checks
-- **Features**:
-  - Uses pnpm for package management
-  - Comments on PR with results
-  - Runs automatically without approval
+### 3. 🧪 All Test Workflows (Run in Parallel)
+These all trigger **after Label PRs completes**:
 
-### 4. Build Check (`build.yml`)
-- **Trigger**: PR to main (using pull_request_target), push to main
+#### 3a. 🧹 Lint Check (`lint.yml`)
+- **Purpose**: Runs ESLint validation
+- **Features**: Uses pnpm, comments on PR with results
+
+#### 3b. 🏗️ Build Check (`build.yml`) 
 - **Purpose**: Ensures application builds successfully
-- **Features**:
-  - TypeScript type checking
-  - Next.js build process
-  - Uploads build artifacts
-  - Comments on PR with results
-  - Includes placeholder Supabase env vars for build process
-  - Runs automatically without approval
+- **Features**: TypeScript checking, Next.js build, uploads artifacts
 
-### 5. Security Check (`security-check.yml`)
-- **Trigger**: PR to main, push to main, weekly schedule
-- **Purpose**: Scans for security vulnerabilities and performs code analysis
-- **Features**:
-  - npm audit for dependency vulnerabilities
-  - CodeQL analysis for code security issues
-  - Comments on PR with security findings
-  - Weekly scheduled scans
+#### 3c. 🔒 Security Check (`security-check.yml`)
+- **Purpose**: Scans for vulnerabilities and security issues
+- **Features**: npm audit, CodeQL analysis, weekly scheduled scans
 
-### 6. Workflow Reporter (`workflow-reporter.yml`)
-- **Trigger**: When other workflows complete
+#### 3d. 🚀 Vercel Deployment (`vercel.yml`)
+- **Purpose**: Handles preview/production deployments
+- **Features**: Preview deployments for PRs, graceful skip if not configured
+
+### 4. 📊 Status Reporter (`status-reporter.yml`)
+- **Trigger**: **Runs LAST** - after all test workflows complete
 - **Purpose**: Provides consolidated reporting of all workflow results
 - **Features**:
-  - Creates/updates a status table in PR comments
-  - Shows status, duration, and links for each workflow
-  - Real-time updates as workflows complete
-
-### 7. Vercel Deployment (`vercel.yml`)
-- **Trigger**: PR to main (preview), push to main (production)
-- **Purpose**: Handles Vercel deployments with fallback for missing secrets
-- **Features**:
-  - Preview deployments for PRs
-  - Production deployments for main branch
-  - Comments PR with preview URLs or skip message
-  - Graceful handling when Vercel is not configured
-
-### 8. PR Status Comment (`pr-status.yml`)
-- **Trigger**: On PR open or reopen
-- **Purpose**: Creates initial status dashboard comment
-- **Features**:
-  - Shows all workflow statuses in a table
-  - Gets updated by workflow reporter
-  - Provides quick overview of PR health
+  - Creates comprehensive status table
+  - Shows final results of all workflows
+  - Updates with real-time status and durations
 
 ## Labels to Create
 

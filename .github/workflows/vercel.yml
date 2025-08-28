@@ -1,7 +1,9 @@
 name: Vercel Deployment
 
 on:
-  pull_request_target:
+  workflow_run:
+    workflows: ["Label PRs"]
+    types: [completed]
     branches: [main]
   push:
     branches: [main]
@@ -17,7 +19,7 @@ permissions:
 
 jobs:
   deploy-preview:
-    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+    if: github.event_name != 'push' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     environment: preview
     

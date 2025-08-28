@@ -1,8 +1,10 @@
 name: Status Reporter
 
 on:
-  pull_request_target:
-    types: [opened, reopened, synchronize]
+  workflow_run:
+    workflows: ["Lint Check", "Build Check", "Security Check", "Vercel Deployment"]
+    types: [completed]
+    branches: [main]
 
 permissions:
   contents: read
@@ -14,8 +16,6 @@ jobs:
   create-status-report:
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for other workflows to start
-        run: sleep 10
 
       - name: Create/Update Status Report
         uses: actions/github-script@v7

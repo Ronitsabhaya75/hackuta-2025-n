@@ -1,28 +1,51 @@
 name: Label PRs
 
 on:
-  pull_request_target:
-    types: [opened, reopened]
+  workflow_run:
+    workflows: ["Gatekeeper"]
+    types: [completed]
+    branches: [main]
 
 permissions:
   contents: read
   issues: write
   pull-requests: write
+  actions: read
 
 jobs:
   label:
     runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
     steps:
-      - name: Get changed files
-        id: changed-files
+      - name: Get PR number
+        id: pr
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${context.payload.workflow_run.head_branch}`,
+              state: 'open'
+            });
+            
+            if (pullRequests.length > 0) {
+              return pullRequests[0].number;
+            }
+            return null;
+      - name: Get changed files
+        id: changed-files
+        if: steps.pr.outputs.result != 'null'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = ${{ steps.pr.outputs.result }};
             const { data: files } = await github.rest.pulls.listFiles({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: context.issue.number,
+              pull_number: prNumber,
             });
             
             const changedFiles = files.map(file => file.filename);
@@ -32,7 +55,8 @@ jobs:
             const patterns = {
               styles: [/^src\/.*\.css$/, /.*\.scss$/, /.*\.sass$/],
               ci: [/^\.github\//, /^package.*\.json$/, /^pnpm-lock\.yaml$/, /^eslint\.config\./, /^next\.config\./, /^tailwind\.config\./, /^tsconfig\.json$/, /^postcss\.config\./, /^vercel\.json$/],
-              javascript: [/^src\/.*\.(js|jsx|ts|tsx)$/],
+              javascript: [/^src\/.*\.(js|jsx)$/],
+              typescript: [/^src\/.*\.(ts|tsx)$/],
               config: [/^components\.json$/],
               json: [/^src\/data\/.*\.json$/],
               assets: [/^public\//],
@@ -92,17 +116,42 @@ jobs:
             }
 
       - name: Add JavaScript label
-        if: steps.changed-files.outputs.javascript_any_changed == 'true'
+        if: steps.changed-files.outputs.javascript_any_changed == 'true' && steps.pr.outputs.result != 'null'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ['javascript']
-            })
+            const prNumber = ${{ steps.pr.outputs.result }};
+            try {
+              await github.rest.issues.addLabels({
+                issue_number: prNumber,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: ['javascript']
+              });
+              console.log('Added JavaScript label successfully');
+            } catch (error) {
+              console.log('Error adding JavaScript label:', error.message);
+            }
+
+      - name: Add TypeScript label
+        if: steps.changed-files.outputs.typescript_any_changed == 'true' && steps.pr.outputs.result != 'null'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = ${{ steps.pr.outputs.result }};
+            try {
+              await github.rest.issues.addLabels({
+                issue_number: prNumber,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: ['typescript']
+              });
+              console.log('Added TypeScript label successfully');
+            } catch (error) {
+              console.log('Error adding TypeScript label:', error.message);
+            }
 
       - name: Add Config label
         if: steps.changed-files.outputs.config_any_changed == 'true'

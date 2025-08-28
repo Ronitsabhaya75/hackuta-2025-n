@@ -1,7 +1,9 @@
 name: Build Check
 
 on:
-  pull_request_target:
+  workflow_run:
+    workflows: ["Label PRs"]
+    types: [completed]
     branches: [main]
   push:
     branches: [main]
@@ -16,6 +18,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.workflow_run.conclusion == 'success'
     strategy:
       matrix:
         node-version: [20]
