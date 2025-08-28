@@ -3,6 +3,7 @@ import faqJson from "../../faq.json";
 export default function Faq() {
   return (
     <>
+      
       {faqJson.map((faq) => (
         <div
           className="accordion py-8 border-b border-solid border-gray-200 "
