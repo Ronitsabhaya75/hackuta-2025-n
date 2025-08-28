@@ -2,7 +2,7 @@ name: Label PRs
 
 on:
   pull_request_target:
-    types: [opened, synchronize, reopened, edited, ready_for_review.github/SETUP.md]
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
@@ -13,7 +13,136 @@ jobs:
   label:
     runs-on: ubuntu-latest
     steps:
-      - uses: nodejs/node-pr-labeler@d4cf1b8b9f23189c37917000e5e17e796c770a6b  # v1
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          configuration-path: .github/label-pr-config.yml
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files_yaml: |
+            ci:
+              - '.github/**'
+              - 'package*.json'
+              - 'pnpm-lock.yaml'
+              - 'eslint.config.*'
+              - 'next.config.*'
+              - 'tailwind.config.*'
+              - 'tsconfig.json'
+              - 'postcss.config.*'
+              - 'components.json'
+              - 'vercel.json'
+            javascript:
+              - 'src/**/*.js'
+              - 'src/**/*.jsx'
+              - 'src/**/*.ts'
+              - 'src/**/*.tsx'
+            json:
+              - 'src/data/**/*.json'
+              - '**/*.json'
+            styles:
+              - 'src/**/*.css'
+              - '**/*.scss'
+              - '**/*.sass'
+            assets:
+              - 'public/**'
+            documentation:
+              - '**/*.md'
+            test:
+              - '**/*.test.*'
+              - '**/*.spec.*'
+              - 'test/**'
+              - 'tests/**'
+
+      - name: Add CI label
+        if: steps.changed-files.outputs.ci_any_changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['ci']
+            })
+
+      - name: Add JavaScript label
+        if: steps.changed-files.outputs.javascript_any_changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['javascript']
+            })
+
+      - name: Add JSON label
+        if: steps.changed-files.outputs.json_any_changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['json']
+            })
+
+      - name: Add Styles label
+        if: steps.changed-files.outputs.styles_any_changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['css', 'styles']
+            })
+
+      - name: Add Assets label
+        if: steps.changed-files.outputs.assets_any_changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['assets']
+            })
+
+      - name: Add Documentation label
+        if: steps.changed-files.outputs.documentation_any_changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['doc']
+            })
+
+      - name: Add Test label
+        if: steps.changed-files.outputs.test_any_changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['test']
+            })
