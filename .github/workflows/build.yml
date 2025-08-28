@@ -4,7 +4,8 @@ on:
   workflow_run:
     workflows: ["Label PRs"]
     types: [completed]
-    branches: [main]
+  pull_request_target:
+    types: [opened, reopened, synchronize]
   push:
     branches: [main]
 
@@ -18,7 +19,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'push' || github.event_name == 'pull_request_target' || github.event.workflow_run.conclusion == 'success'
     strategy:
       matrix:
         node-version: [20]

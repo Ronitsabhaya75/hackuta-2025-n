@@ -4,7 +4,8 @@ on:
   workflow_run:
     workflows: ["Gatekeeper"]
     types: [completed]
-    branches: [main]
+  pull_request_target:
+    types: [opened, reopened, synchronize]
 
 permissions:
   contents: read
@@ -15,7 +16,7 @@ permissions:
 jobs:
   label:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'pull_request_target' || github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Get PR number
         id: pr
@@ -23,15 +24,19 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { data: pullRequests } = await github.rest.pulls.list({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              head: `${context.repo.owner}:${context.payload.workflow_run.head_branch}`,
-              state: 'open'
-            });
-            
-            if (pullRequests.length > 0) {
-              return pullRequests[0].number;
+            if (github.event_name === 'pull_request_target') {
+              return context.issue.number;
+            } else if (github.event_name === 'workflow_run') {
+              const { data: pullRequests } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: `${context.repo.owner}:${context.payload.workflow_run.head_branch}`,
+                state: 'open'
+              });
+              
+              if (pullRequests.length > 0) {
+                return pullRequests[0].number;
+              }
             }
             return null;
       - name: Get changed files

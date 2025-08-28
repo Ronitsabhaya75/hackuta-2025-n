@@ -17,16 +17,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Create/Update Status Report
+      - name: Get PR info
+        id: pr-info
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            // Find the PR associated with this workflow run
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${context.payload.workflow_run.head_branch}`,
+              state: 'open'
+            });
+            
+            if (pullRequests.length > 0) {
+              return {
+                number: pullRequests[0].number,
+                head_sha: pullRequests[0].head.sha
+              };
+            }
+            return null;
+
+      - name: Create/Update Status Report
+        if: steps.pr-info.outputs.result != 'null'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prInfo = ${{ steps.pr-info.outputs.result }};
+            
             // Get all workflow runs for this PR
             const { data: runs } = await github.rest.actions.listWorkflowRunsForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              head_sha: context.payload.pull_request.head.sha,
+              head_sha: prInfo.head_sha,
               per_page: 50
             });
 
@@ -76,7 +101,7 @@ jobs:
 
             // Check for existing status comment
             const { data: comments } = await github.rest.issues.listComments({
-              issue_number: context.issue.number,
+              issue_number: prInfo.number,
               owner: context.repo.owner,
               repo: context.repo.repo
             });
@@ -98,7 +123,7 @@ jobs:
             } else {
               // Create new comment
               await github.rest.issues.createComment({
-                issue_number: context.issue.number,
+                issue_number: prInfo.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 body: statusTable
