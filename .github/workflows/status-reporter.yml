@@ -4,7 +4,6 @@ on:
   workflow_run:
     workflows: ["Lint Check", "Build Check", "Security Check", "Vercel Deployment"]
     types: [completed]
-    branches: [main]
 
 permissions:
   contents: read
