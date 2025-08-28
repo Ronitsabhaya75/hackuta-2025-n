@@ -1,0 +1,43 @@
+name: PR Status Comment
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  create-status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create initial status comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const statusComment = `## 🚀 PR Status Dashboard
+
+| Workflow | Status | Duration | Details |
+|----------|--------|----------|---------|
+| 🏷️ Label PRs | ⏳ Running | - | [View](https://github.com/${context.repo.owner}/${context.repo.repo}/actions) |
+| 🔓 Gatekeeper | ⏳ Running | - | [View](https://github.com/${context.repo.owner}/${context.repo.repo}/actions) |
+| 🧹 Lint Check | ⏳ Pending | - | [View](https://github.com/${context.repo.owner}/${context.repo.repo}/actions) |
+| 🏗️ Build Check | ⏳ Pending | - | [View](https://github.com/${context.repo.owner}/${context.repo.repo}/actions) |
+| 🔒 Security Check | ⏳ Pending | - | [View](https://github.com/${context.repo.owner}/${context.repo.repo}/actions) |
+| 🚀 Vercel Deploy | ⏳ Pending | - | [View](https://github.com/${context.repo.owner}/${context.repo.repo}/actions) |
+
+*This comment will be updated automatically as workflows complete.*
+
+---
+**Legend:** ⏳ Running • ✅ Passed • ❌ Failed • ⏸️ Skipped
+`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: statusComment
+            });

@@ -1,6 +1,6 @@
 # GitHub Actions Setup
 
-This repository includes 6 separate GitHub Actions workflows that run independently:
+This repository includes 8 separate GitHub Actions workflows that run independently:
 
 ## Workflows Created
 
@@ -57,6 +57,23 @@ This repository includes 6 separate GitHub Actions workflows that run independen
   - Creates/updates a status table in PR comments
   - Shows status, duration, and links for each workflow
   - Real-time updates as workflows complete
+
+### 7. Vercel Deployment (`vercel.yml`)
+- **Trigger**: PR to main (preview), push to main (production)
+- **Purpose**: Handles Vercel deployments with fallback for missing secrets
+- **Features**:
+  - Preview deployments for PRs
+  - Production deployments for main branch
+  - Comments PR with preview URLs or skip message
+  - Graceful handling when Vercel is not configured
+
+### 8. PR Status Comment (`pr-status.yml`)
+- **Trigger**: On PR open or reopen
+- **Purpose**: Creates initial status dashboard comment
+- **Features**:
+  - Shows all workflow statuses in a table
+  - Gets updated by workflow reporter
+  - Provides quick overview of PR health
 
 ## Labels to Create
 

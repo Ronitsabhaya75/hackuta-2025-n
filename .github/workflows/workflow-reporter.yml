@@ -2,7 +2,7 @@ name: Workflow Reporter
 
 on:
   workflow_run:
-    workflows: ["Label PRs", "Lint Check", "Build Check", "Security Check", "Gatekeeper"]
+    workflows: ["Label PRs", "Lint Check", "Build Check", "Security Check", "Gatekeeper", "Vercel Deployment"]
     types: [completed]
 
 permissions:
@@ -22,12 +22,16 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            // For workflow_run events, we need to find the PR associated with the head branch
             const { data: pullRequests } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
               head: `${context.repo.owner}:${context.payload.workflow_run.head_branch}`,
               state: 'open'
             });
+            
+            console.log('Found PRs:', pullRequests.length);
+            console.log('Head branch:', context.payload.workflow_run.head_branch);
             
             if (pullRequests.length > 0) {
               return pullRequests[0].number;
