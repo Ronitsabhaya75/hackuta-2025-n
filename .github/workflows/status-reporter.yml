@@ -45,7 +45,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const prInfo = ${{ steps.pr-info.outputs.result }};
+            const prInfo = JSON.parse('${{ steps.pr-info.outputs.result }}');
             
             // Get all workflow runs for this PR
             const { data: runs } = await github.rest.actions.listWorkflowRunsForRepo({

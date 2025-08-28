@@ -5,7 +5,7 @@ on:
     workflows: ["Gatekeeper"]
     types: [completed]
   pull_request_target:
-    types: [opened, reopened, synchronize]
+    types: [opened, reopened]
 
 permissions:
   contents: read
@@ -39,6 +39,7 @@ jobs:
               }
             }
             return null;
+
       - name: Get changed files
         id: changed-files
         if: steps.pr.outputs.result != 'null'
@@ -46,7 +47,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const prNumber = ${{ steps.pr.outputs.result }};
+            const prNumber = parseInt('${{ steps.pr.outputs.result }}');
             const { data: files } = await github.rest.pulls.listFiles({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -84,18 +85,20 @@ jobs:
             return results;
 
       - name: Post labeling summary
+        if: steps.pr.outputs.result != 'null'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const results = ${{ steps.changed-files.outputs.result }};
+            const prNumber = parseInt('${{ steps.pr.outputs.result }}');
+            const results = JSON.parse('${{ steps.changed-files.outputs.result }}');
             const appliedLabels = Object.entries(results)
               .filter(([_, hasChanges]) => hasChanges)
               .map(([category]) => category);
             
             if (appliedLabels.length > 0) {
               await github.rest.issues.createComment({
-                issue_number: context.issue.number,
+                issue_number: prNumber,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 body: `🏷️ **Auto-Labeler Results**\n\nApplied labels: ${appliedLabels.map(label => `\`${label}\``).join(', ')}\n\nBased on detected file changes in this PR.`
@@ -126,7 +129,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const prNumber = ${{ steps.pr.outputs.result }};
+            const prNumber = parseInt('${{ steps.pr.outputs.result }}');
             try {
               await github.rest.issues.addLabels({
                 issue_number: prNumber,
@@ -145,7 +148,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const prNumber = ${{ steps.pr.outputs.result }};
+            const prNumber = parseInt('${{ steps.pr.outputs.result }}');
             try {
               await github.rest.issues.addLabels({
                 issue_number: prNumber,
