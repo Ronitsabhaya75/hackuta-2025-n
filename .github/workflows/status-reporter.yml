@@ -1,0 +1,107 @@
+name: Status Reporter
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  actions: read
+
+jobs:
+  create-status-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for other workflows to start
+        run: sleep 10
+
+      - name: Create/Update Status Report
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Get all workflow runs for this PR
+            const { data: runs } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head_sha: context.payload.pull_request.head.sha,
+              per_page: 50
+            });
+
+            // Filter to relevant workflows
+            const workflowNames = [
+              'Gatekeeper',
+              'Label PRs', 
+              'Lint Check',
+              'Build Check',
+              'Security Check',
+              'Vercel Deployment'
+            ];
+
+            const workflowStatus = {};
+            
+            for (const run of runs.workflow_runs) {
+              if (workflowNames.includes(run.name)) {
+                const status = run.status === 'completed' ? 
+                  (run.conclusion === 'success' ? '✅ Passed' :
+                   run.conclusion === 'failure' ? '❌ Failed' :
+                   run.conclusion === 'skipped' ? '⏸️ Skipped' : '⚠️ ' + run.conclusion) :
+                  '⏳ Running';
+                
+                const duration = run.status === 'completed' ? 
+                  Math.round((new Date(run.updated_at) - new Date(run.created_at)) / 1000) + 's' : '-';
+
+                workflowStatus[run.name] = {
+                  status,
+                  duration,
+                  url: run.html_url
+                };
+              }
+            }
+
+            // Create status table
+            let statusTable = `## 📊 Workflow Status Report\n\n`;
+            statusTable += `| Workflow | Status | Duration | Details |\n`;
+            statusTable += `|----------|--------|----------|----------|\n`;
+
+            for (const workflow of workflowNames) {
+              const info = workflowStatus[workflow] || { status: '⏳ Pending', duration: '-', url: '#' };
+              statusTable += `| ${workflow} | ${info.status} | ${info.duration} | [View](${info.url}) |\n`;
+            }
+
+            statusTable += `\n*Last updated: ${new Date().toLocaleString()}*\n`;
+            statusTable += `\n**Legend:** ⏳ Running/Pending • ✅ Passed • ❌ Failed • ⏸️ Skipped`;
+
+            // Check for existing status comment
+            const { data: comments } = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+
+            const statusComment = comments.find(comment => 
+              comment.body.includes('📊 Workflow Status Report') && 
+              comment.user.login === 'github-actions[bot]'
+            );
+
+            if (statusComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                comment_id: statusComment.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: statusTable
+              });
+              console.log('Updated existing status comment');
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: statusTable
+              });
+              console.log('Created new status comment');
+            }
