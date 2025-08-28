@@ -23,6 +23,10 @@ jobs:
         uses: tj-actions/changed-files@v44
         with:
           files_yaml: |
+            styles:
+              - 'src/**/*.css'
+              - '**/*.scss'
+              - '**/*.sass'
             ci:
               - '.github/**'
               - 'package*.json'
@@ -42,10 +46,6 @@ jobs:
             json:
               - 'src/data/**/*.json'
               - '**/*.json'
-            styles:
-              - 'src/**/*.css'
-              - '**/*.scss'
-              - '**/*.sass'
             assets:
               - 'public/**'
             documentation:
