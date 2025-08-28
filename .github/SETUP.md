@@ -1,6 +1,6 @@
 # GitHub Actions Setup
 
-This repository includes 4 separate GitHub Actions workflows that run independently:
+This repository includes 3 separate GitHub Actions workflows that run independently:
 
 ## Workflows Created
 
@@ -31,26 +31,7 @@ This repository includes 4 separate GitHub Actions workflows that run independen
   - Next.js build process
   - Uploads build artifacts
   - Comments on PR with results
-
-### 4. Vercel Deployment (`vercel.yml`)
-- **Trigger**: PR to main (preview), push to main (production)
-- **Purpose**: Handles Vercel deployments
-- **Features**:
-  - Preview deployments for PRs
-  - Production deployments for main branch
-  - Comments PR with preview URLs
-
-## Required Secrets
-
-Add these secrets in your GitHub repository settings:
-
-```
-VERCEL_TOKEN=your_vercel_token
-VERCEL_ORG_ID=your_vercel_org_id
-VERCEL_PROJECT_ID=your_vercel_project_id
-```
-
-**Note**: The Vercel workflow will fail until you add these secrets. The other workflows (auto-labeler, lint, build) will work immediately.
+  - Includes placeholder Supabase env vars for build process
 
 ## Labels to Create
 
