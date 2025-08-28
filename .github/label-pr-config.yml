@@ -1,0 +1,56 @@
+## Order of entries in this map *does* matter for the resolved labels
+## earlier entries override later entries
+subSystemLabels:
+  # GitHub workflows and CI - more specific patterns first
+  /^\.github\/workflows\/.*\.yml$/: ci, workflows
+  /^\.github\/workflows\//: ci, workflows
+  /^\.github\//: ci
+  
+  # Build and configuration files
+  /^(?:package\.json|package-lock\.json|pnpm-lock\.yaml)$/: ci, dependencies
+  /^(?:eslint\.config\.|tsconfig\.json|tailwind\.config\.|next\.config\.|postcss\.config\.).*$/: ci, build
+  /^(?:components\.json|vercel\.json)$/: ci, config
+  
+  # Source code - JavaScript/TypeScript
+  /^src\/app\/.*\.(js|jsx|ts|tsx)$/: javascript, app
+  /^src\/components\/.*\.(js|jsx|ts|tsx)$/: javascript, components
+  /^src\/lib\/.*\.(js|jsx|ts|tsx)$/: javascript, lib
+  /^src\/hooks\/.*\.(js|jsx|ts|tsx)$/: javascript, hooks
+  /^src\/.*\.(js|jsx|ts|tsx)$/: javascript
+  
+  # Data files
+  /^src\/data\/.*\.json$/: json, data
+  /^.*\.json$/: json
+  
+  # Styles
+  /^src\/app\/globals\.css$/: css, styles
+  /^.*\.(css|scss|sass)$/: css, styles
+  
+  # Public assets
+  /^public\/.*\.(svg|png|jpg|jpeg|gif|ico|ttf|woff|woff2)$/: assets
+  /^public\//: assets
+  
+  # Documentation
+  /^README\.md$/: doc, readme
+  /^.*\.md$/: doc
+
+exclusiveLabels:
+  # Test files - these get only test label, not others
+  /^test\/.*\.test\.(js|jsx|ts|tsx)$/: test
+  /^test\/.*\.spec\.(js|jsx|ts|tsx)$/: test
+  /^tests\/.*\.test\.(js|jsx|ts|tsx)$/: test
+  /^tests\/.*\.spec\.(js|jsx|ts|tsx)$/: test
+  /^.*\.test\.(js|jsx|ts|tsx)$/: test
+  /^.*\.spec\.(js|jsx|ts|tsx)$/: test
+  /^test\//: test
+  /^tests\//: test
+
+allJsSubSystems:
+  - components
+  - lib
+  - hooks
+  - app
+  - data
+  - styles
+  - assets
+  - config

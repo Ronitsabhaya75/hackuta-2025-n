@@ -1,26 +1,10 @@
 name: Lint Check
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [main]
-    paths:
-      - '**/*.js'
-      - '**/*.jsx'
-      - '**/*.ts'
-      - '**/*.tsx'
-      - 'package*.json'
-      - 'pnpm-lock.yaml'
-      - 'eslint.config.*'
   push:
     branches: [main]
-    paths:
-      - '**/*.js'
-      - '**/*.jsx'
-      - '**/*.ts'
-      - '**/*.tsx'
-      - 'package*.json'
-      - 'pnpm-lock.yaml'
-      - 'eslint.config.*'
 
 permissions:
   contents: read
