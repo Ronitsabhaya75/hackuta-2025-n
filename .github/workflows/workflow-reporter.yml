@@ -2,7 +2,7 @@ name: Workflow Reporter
 
 on:
   workflow_run:
-    workflows: ["Label PRs", "Lint Check", "Build Check", "Security Check"]
+    workflows: ["Label PRs", "Lint Check", "Build Check", "Security Check", "Gatekeeper"]
     types: [completed]
 
 permissions:
@@ -14,7 +14,7 @@ permissions:
 jobs:
   report:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.event == 'pull_request'
+    if: github.event.workflow_run.event == 'pull_request' || github.event.workflow_run.event == 'pull_request_target'
     steps:
       - name: Get PR number
         id: pr

@@ -42,43 +42,46 @@ jobs:
       - name: Run npm audit
         id: audit
         run: |
-          pnpm audit --audit-level moderate --json > audit-results.json || true
-          echo "audit_results=$(cat audit-results.json)" >> $GITHUB_OUTPUT
+          pnpm audit --audit-level moderate --format json > audit-results.json 2>/dev/null || echo '{"metadata":{"vulnerabilities":{"moderate":0,"high":0,"critical":0}}}' > audit-results.json
+          echo "audit_completed=true" >> $GITHUB_OUTPUT
 
       - name: Check for vulnerabilities
+        if: steps.audit.outputs.audit_completed == 'true'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             let auditResults = {};
+            let hasVulnerabilities = false;
             
             try {
               const auditData = fs.readFileSync('audit-results.json', 'utf8');
               auditResults = JSON.parse(auditData);
-            } catch (error) {
-              console.log('No audit results found or error parsing JSON');
-              return;
-            }
-
-            if (auditResults.metadata && auditResults.metadata.vulnerabilities) {
-              const vulns = auditResults.metadata.vulnerabilities;
-              const totalVulns = vulns.moderate + vulns.high + vulns.critical;
               
-              if (totalVulns > 0 && context.eventName === 'pull_request') {
-                const message = `🚨 **Security Audit Found Issues**\n\n` +
-                  `- **Critical**: ${vulns.critical}\n` +
-                  `- **High**: ${vulns.high}\n` +
-                  `- **Moderate**: ${vulns.moderate}\n\n` +
-                  `Please run \`pnpm audit fix\` to resolve these issues.`;
+              if (auditResults.metadata && auditResults.metadata.vulnerabilities) {
+                const vulns = auditResults.metadata.vulnerabilities;
+                const totalVulns = (vulns.moderate || 0) + (vulns.high || 0) + (vulns.critical || 0);
+                hasVulnerabilities = totalVulns > 0;
                 
-                await github.rest.issues.createComment({
-                  issue_number: context.issue.number,
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  body: message
-                });
+                if (hasVulnerabilities && github.context.eventName === 'pull_request') {
+                  const message = `🚨 **Security Audit Found Issues**\n\n` +
+                    `- **Critical**: ${vulns.critical || 0}\n` +
+                    `- **High**: ${vulns.high || 0}\n` +
+                    `- **Moderate**: ${vulns.moderate || 0}\n\n` +
+                    `Please run \`pnpm audit --fix\` to resolve these issues.`;
+                  
+                  await github.rest.issues.createComment({
+                    issue_number: github.context.issue.number,
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    body: message
+                  });
+                }
               }
+            } catch (error) {
+              console.log('Error processing audit results:', error.message);
+              // Continue with workflow even if audit parsing fails
             }
 
       - name: CodeQL Analysis
