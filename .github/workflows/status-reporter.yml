@@ -40,7 +40,7 @@ jobs:
             const prInfo = pullRequests[0];
             console.log(`Found PR #${prInfo.number}`);
             
-            // Required workflows that must complete before status report
+            // Required workflows that must complete before status report (excluding Gatekeeper and Label PRs)
             const requiredWorkflows = [
               'Lint Check', 
               'Build Check', 
@@ -132,15 +132,13 @@ jobs:
               per_page: 50
             });
 
-            // Filter to relevant workflows
-            const workflowNames = [
-              'Gatekeeper',
-              'Label PRs', 
-              'Lint Check',
-              'Build Check',
-              'Security Check',
-              'Vercel Deployment'
-            ];
+                               // Filter to relevant workflows (exclude Gatekeeper and Label PRs)
+                   const workflowNames = [
+                     'Lint Check', 
+                     'Build Check', 
+                     'Security Check', 
+                     'Vercel Deployment'
+                   ];
 
             const workflowStatus = {};
             
