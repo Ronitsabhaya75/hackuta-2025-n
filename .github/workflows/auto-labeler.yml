@@ -1,11 +1,8 @@
 name: Label PRs
 
 on:
-  workflow_run:
-    workflows: ["Gatekeeper"]
-    types: [completed]
   pull_request_target:
-    types: [opened, reopened]
+    types: [opened, reopened, synchronize]
 
 permissions:
   contents: read
@@ -16,7 +13,6 @@ permissions:
 jobs:
   label:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request_target' || github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Get PR number
         id: pr
@@ -24,25 +20,10 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            if (github.event_name === 'pull_request_target') {
-              return context.issue.number;
-            } else if (github.event_name === 'workflow_run') {
-              const { data: pullRequests } = await github.rest.pulls.list({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                head: `${context.repo.owner}:${context.payload.workflow_run.head_branch}`,
-                state: 'open'
-              });
-              
-              if (pullRequests.length > 0) {
-                return pullRequests[0].number;
-              }
-            }
-            return null;
+            return context.issue.number;
 
       - name: Get changed files
         id: changed-files
-        if: steps.pr.outputs.result != 'null'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -56,16 +37,18 @@ jobs:
             
             const changedFiles = files.map(file => file.filename);
             console.log('Changed files:', changedFiles);
+            console.log('Event name:', github.context.eventName);
+            console.log('PR number from context:', prNumber);
             
             // Check file patterns
             const patterns = {
-              styles: [/^src\/.*\.css$/, /.*\.scss$/, /.*\.sass$/],
+              styles: [/^src\/.*\.css$/, /^public\/.*\.css$/, /.*\.scss$/, /.*\.sass$/],
               ci: [/^\.github\//, /^package.*\.json$/, /^pnpm-lock\.yaml$/, /^eslint\.config\./, /^next\.config\./, /^tailwind\.config\./, /^tsconfig\.json$/, /^postcss\.config\./, /^vercel\.json$/],
               javascript: [/^src\/.*\.(js|jsx)$/],
               typescript: [/^src\/.*\.(ts|tsx)$/],
               config: [/^components\.json$/],
               json: [/^src\/data\/.*\.json$/],
-              assets: [/^public\//],
+              assets: [/^public\/(?!.*\.css$).*$/],
               documentation: [/.*\.md$/],
               test: [/.*\.(test|spec)\./, /^tests?\//, /^test\//]
             };
@@ -75,7 +58,11 @@ jobs:
               results[category] = changedFiles.some(file => 
                 regexes.some(regex => regex.test(file))
               );
+              if (results[category]) {
+                console.log(`Category '${category}' matched for files:`, changedFiles);
+              }
             }
+            console.log('Final results:', results);
             
             // Set outputs
             for (const [category, hasChanges] of Object.entries(results)) {
@@ -85,7 +72,6 @@ jobs:
             return results;
 
       - name: Post labeling summary
-        if: steps.pr.outputs.result != 'null'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -124,7 +110,7 @@ jobs:
             }
 
       - name: Add JavaScript label
-        if: steps.changed-files.outputs.javascript_any_changed == 'true' && steps.pr.outputs.result != 'null'
+        if: steps.changed-files.outputs.javascript_any_changed == 'true'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -143,7 +129,7 @@ jobs:
             }
 
       - name: Add TypeScript label
-        if: steps.changed-files.outputs.typescript_any_changed == 'true' && steps.pr.outputs.result != 'null'
+        if: steps.changed-files.outputs.typescript_any_changed == 'true'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

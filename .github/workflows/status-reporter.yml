@@ -16,6 +16,83 @@ jobs:
   create-status-report:
     runs-on: ubuntu-latest
     steps:
+      - name: Wait for all workflows to complete
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Wait a bit to ensure other workflows have time to start/complete
+            await new Promise(resolve => setTimeout(resolve, 30000)); // 30 second delay
+            
+            // Get the PR info first
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${context.payload.workflow_run.head_branch}`,
+              state: 'open'
+            });
+            
+            if (pullRequests.length === 0) {
+              console.log('No open PR found for this branch');
+              return;
+            }
+            
+            const prInfo = pullRequests[0];
+            console.log(`Found PR #${prInfo.number}`);
+            
+            // Required workflows that must complete before status report
+            const requiredWorkflows = [
+              'Lint Check', 
+              'Build Check', 
+              'Security Check', 
+              'Vercel Deployment'
+            ];
+            
+            let allCompleted = false;
+            let attempts = 0;
+            const maxAttempts = 10;
+            
+            while (!allCompleted && attempts < maxAttempts) {
+              attempts++;
+              console.log(`Attempt ${attempts}/${maxAttempts}: Checking workflow statuses...`);
+              
+              // Get all workflow runs for this PR
+              const { data: runs } = await github.rest.actions.listWorkflowRunsForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head_sha: prInfo.head.sha,
+                per_page: 50
+              });
+              
+              // Check if all required workflows are completed
+              const workflowStatuses = {};
+              runs.workflow_runs.forEach(run => {
+                if (requiredWorkflows.includes(run.name)) {
+                  workflowStatuses[run.name] = {
+                    status: run.status,
+                    conclusion: run.conclusion
+                  };
+                }
+              });
+              
+              console.log('Workflow statuses:', workflowStatuses);
+              
+              allCompleted = requiredWorkflows.every(workflow => {
+                const status = workflowStatuses[workflow];
+                return status && status.status === 'completed';
+              });
+              
+              if (!allCompleted) {
+                console.log('Not all workflows completed yet, waiting 30 seconds...');
+                await new Promise(resolve => setTimeout(resolve, 30000)); // Wait 30 seconds
+              }
+            }
+            
+            if (!allCompleted) {
+              console.log('Timeout: Not all workflows completed, proceeding anyway');
+            } else {
+              console.log('All workflows completed, proceeding with status report');
+            }
 
       - name: Get PR info
         id: pr-info
