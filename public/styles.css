@@ -15,7 +15,9 @@ body {
     padding: 0;
     background: linear-gradient(to top, #000000, #230074, #6a0572);
     overflow-x: hidden; /* Prevent horizontal scroll */
-}
+} 
+
+
 
 /* Creates space for scrolling */
 .scroll-container {
