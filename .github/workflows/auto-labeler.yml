@@ -13,49 +13,46 @@ jobs:
   label:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
-
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v44
+        uses: actions/github-script@v7
         with:
-          files_yaml: |
-            styles:
-              - 'src/**/*.css'
-              - '**/*.scss'
-              - '**/*.sass'
-            ci:
-              - '.github/**'
-              - 'package*.json'
-              - 'pnpm-lock.yaml'
-              - 'eslint.config.*'
-              - 'next.config.*'
-              - 'tailwind.config.*'
-              - 'tsconfig.json'
-              - 'postcss.config.*'
-              - 'vercel.json'
-            javascript:
-              - 'src/**/*.js'
-              - 'src/**/*.jsx'
-              - 'src/**/*.ts'
-              - 'src/**/*.tsx'
-            config:
-              - 'components.json'
-            json:
-              - 'src/data/**/*.json'
-            assets:
-              - 'public/**'
-            documentation:
-              - '**/*.md'
-            test:
-              - '**/*.test.*'
-              - '**/*.spec.*'
-              - 'test/**'
-              - 'tests/**'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            
+            const changedFiles = files.map(file => file.filename);
+            console.log('Changed files:', changedFiles);
+            
+            // Check file patterns
+            const patterns = {
+              styles: [/^src\/.*\.css$/, /.*\.scss$/, /.*\.sass$/],
+              ci: [/^\.github\//, /^package.*\.json$/, /^pnpm-lock\.yaml$/, /^eslint\.config\./, /^next\.config\./, /^tailwind\.config\./, /^tsconfig\.json$/, /^postcss\.config\./, /^vercel\.json$/],
+              javascript: [/^src\/.*\.(js|jsx|ts|tsx)$/],
+              config: [/^components\.json$/],
+              json: [/^src\/data\/.*\.json$/],
+              assets: [/^public\//],
+              documentation: [/.*\.md$/],
+              test: [/.*\.(test|spec)\./, /^tests?\//, /^test\//]
+            };
+            
+            const results = {};
+            for (const [category, regexes] of Object.entries(patterns)) {
+              results[category] = changedFiles.some(file => 
+                regexes.some(regex => regex.test(file))
+              );
+            }
+            
+            // Set outputs
+            for (const [category, hasChanges] of Object.entries(results)) {
+              core.setOutput(`${category}_any_changed`, hasChanges.toString());
+            }
+            
+            return results;
 
       - name: Add CI label
         if: steps.changed-files.outputs.ci_any_changed == 'true'
