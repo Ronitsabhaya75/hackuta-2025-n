@@ -50,6 +50,8 @@ VERCEL_ORG_ID=your_vercel_org_id
 VERCEL_PROJECT_ID=your_vercel_project_id
 ```
 
+**Note**: The Vercel workflow will fail until you add these secrets. The other workflows (auto-labeler, lint, build) will work immediately.
+
 ## Labels to Create
 
 Create these labels in your GitHub repository:
