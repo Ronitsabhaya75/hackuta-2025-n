@@ -15,9 +15,7 @@ function useWindowSize() {
         width: window.innerWidth,
         height: window.innerHeight,
       });
-    }
-    
-    
+    }   
     window.addEventListener("resize", handleResize);
     handleResize();
 
